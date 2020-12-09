@@ -10,6 +10,7 @@ use LukeTowers\ShopifyPHP\Credentials\AccessToken;
 use LukeTowers\ShopifyPHP\Credentials\ApiCredentials;
 use LukeTowers\ShopifyPHP\Credentials\ApiKey;
 use LukeTowers\ShopifyPHP\Credentials\ShopDomain;
+use LukeTowers\ShopifyPHP\Credentials\ShopDomainException;
 use LukeTowers\ShopifyPHP\Http\JsonClient;
 use LukeTowers\ShopifyPHP\Http\JsonClientException;
 use LukeTowers\ShopifyPHP\Http\JsonClientInterface;
@@ -17,6 +18,7 @@ use LukeTowers\ShopifyPHP\OAuth\AuthorizationException;
 use LukeTowers\ShopifyPHP\OAuth\AuthorizationRequest;
 use LukeTowers\ShopifyPHP\OAuth\AuthorizationResponse;
 use LukeTowers\ShopifyPHP\OAuth\Scopes;
+use LukeTowers\ShopifyPHP\Webhooks\WebhookRequest;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 
@@ -120,6 +122,46 @@ class Shopify
             }
         }
 
+        $this->checkRequestSignature($requestData, $requestData['hmac']);
+
+        return $requestShopDomain;
+    }
+
+    /**
+     * @param array $headers
+     * @param array $data
+     * @return WebhookRequest
+     * @throws AuthorizationException
+     */
+    public function validateWebhookRequest(array $headers, array $data): WebhookRequest
+    {
+        try {
+            $shopDomain = ShopDomain::create($headers['X-Shopify-Shop-Domain'] ?? null);
+        } catch (\Throwable $e) {
+            throw new AuthorizationException("The shop provided by Shopify is invalid: " . $e->getMessage());
+        }
+
+        if (!isset($headers['X-Shopify-Topic'])) {
+            throw new AuthorizationException('Missing webhook topic');
+        }
+        if(!\is_string($headers['X-Shopify-Topic'])) {
+            throw new \InvalidArgumentException('Topic header expected to be string');
+        }
+
+        if (!isset($headers['X-Shopify-Hmac-Sha256'])) {
+            throw new AuthorizationException('Missing webhook signature');
+        }
+        if (!\is_string($headers['X-Shopify-Hmac-Sha256'])) {
+            throw new \InvalidArgumentException('Signature header expected to be string');
+        }
+
+        $this->checkRequestSignature($data, $headers['X-Shopify-Hmac-Sha256']);
+
+        return new WebhookRequest($shopDomain, $headers['X-Shopify-Topic']);
+    }
+
+    private function checkRequestSignature(array $requestData, string $hmac): void
+    {
         // Check HMAC signature. See https://help.shopify.com/api/getting-started/authentication/oauth#verification
         $hmacSource = [];
         foreach ($requestData as $key => $value) {
@@ -145,16 +187,15 @@ class Shopify
         $hmacString = hash_hmac('sha256', $hmacBase, (string) $this->credentials->getSecret());
 
         // Verify that the signatures match
-        if ($hmacString !== $requestData['hmac']) {
+        if ($hmacString !== $hmac) {
             throw new AuthorizationException(\sprintf(
                 "The HMAC provided by Shopify (%s) doesn't match the HMAC verification (%s).",
-                $requestData['hmac'],
+                $hmac,
                 $hmacString
             ));
         }
-
-        return $requestShopDomain;
     }
+
 
     /**
      * @param array $requestData
