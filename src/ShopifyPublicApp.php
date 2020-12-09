@@ -15,6 +15,7 @@ use LukeTowers\ShopifyPHP\OAuth\AuthorizationResponse;
 use LukeTowers\ShopifyPHP\OAuth\ScopeException;
 use LukeTowers\ShopifyPHP\OAuth\Scopes;
 use LukeTowers\ShopifyPHP\Webhooks\WebhookRequest;
+use Psr\Http\Message\RequestInterface;
 
 class ShopifyPublicApp
 {
@@ -78,14 +79,13 @@ class ShopifyPublicApp
     }
 
     /**
-     * @param array $headers
-     * @param array $data
+     * @param RequestInterface $request
      * @return WebhookRequest
      * @throws AuthorizationException
      */
-    public function validateWebhookRequest(array $headers, array $data): WebhookRequest
+    public function validateWebhookRequest(RequestInterface $request): WebhookRequest
     {
-        return $this->shopify->validateWebhookRequest($headers, $data);
+        return $this->shopify->validateWebhookRequest($request);
     }
 
     /**

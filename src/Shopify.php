@@ -21,6 +21,7 @@ use LukeTowers\ShopifyPHP\OAuth\Scopes;
 use LukeTowers\ShopifyPHP\Webhooks\WebhookRequest;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\RequestInterface;
 
 class Shopify
 {
@@ -122,46 +123,6 @@ class Shopify
             }
         }
 
-        $this->checkRequestSignature($requestData, $requestData['hmac']);
-
-        return $requestShopDomain;
-    }
-
-    /**
-     * @param array $headers
-     * @param array $data
-     * @return WebhookRequest
-     * @throws AuthorizationException
-     */
-    public function validateWebhookRequest(array $headers, array $data): WebhookRequest
-    {
-        try {
-            $shopDomain = ShopDomain::create($headers['X-Shopify-Shop-Domain'] ?? null);
-        } catch (\Throwable $e) {
-            throw new AuthorizationException("The shop provided by Shopify is invalid: " . $e->getMessage());
-        }
-
-        if (!isset($headers['X-Shopify-Topic'])) {
-            throw new AuthorizationException('Missing webhook topic');
-        }
-        if(!\is_string($headers['X-Shopify-Topic'])) {
-            throw new \InvalidArgumentException('Topic header expected to be string');
-        }
-
-        if (!isset($headers['X-Shopify-Hmac-Sha256'])) {
-            throw new AuthorizationException('Missing webhook signature');
-        }
-        if (!\is_string($headers['X-Shopify-Hmac-Sha256'])) {
-            throw new \InvalidArgumentException('Signature header expected to be string');
-        }
-
-        $this->checkRequestSignature($data, $headers['X-Shopify-Hmac-Sha256']);
-
-        return new WebhookRequest($shopDomain, $headers['X-Shopify-Topic']);
-    }
-
-    private function checkRequestSignature(array $requestData, string $hmac): void
-    {
         // Check HMAC signature. See https://help.shopify.com/api/getting-started/authentication/oauth#verification
         $hmacSource = [];
         foreach ($requestData as $key => $value) {
@@ -187,15 +148,71 @@ class Shopify
         $hmacString = hash_hmac('sha256', $hmacBase, (string) $this->credentials->getSecret());
 
         // Verify that the signatures match
-        if ($hmacString !== $hmac) {
+        if ($hmacString !== $requestData['hmac']) {
             throw new AuthorizationException(\sprintf(
                 "The HMAC provided by Shopify (%s) doesn't match the HMAC verification (%s).",
-                $hmac,
+                $requestData['hmac'],
                 $hmacString
             ));
         }
+
+        return $requestShopDomain;
     }
 
+    /**
+     * @param RequestInterface $request
+     * @return WebhookRequest
+     * @throws AuthorizationException
+     */
+    public function validateWebhookRequest(RequestInterface  $request): WebhookRequest
+    {
+        $shopDomainHeader = $request->getHeaderLine('X-Shopify-Shop-Domain');
+        $topicHeader = $request->getHeaderLine('X-Shopify-Topic');
+        $hmacHeader = $request->getHeaderLine('X-Shopify-Hmac-Sha256');
+        $contentTypeHeader = $request->getHeaderLine('Content-Type');
+
+        try {
+            $shopDomain = ShopDomain::create($shopDomainHeader);
+        } catch (\Throwable $e) {
+            throw new AuthorizationException("The shop provided by Shopify is invalid: " . $e->getMessage());
+        }
+
+        if (!$topicHeader) {
+            throw new AuthorizationException('Missing webhook topic');
+        }
+
+        if (!$hmacHeader) {
+            throw new AuthorizationException('Missing webhook signature');
+        }
+
+        if (!$contentTypeHeader) {
+            throw new AuthorizationException('Missing webhook content type');
+        }
+
+        $requestBody = (string) $request->getBody();
+
+        $hmacString = base64_encode(hash_hmac('sha256', $requestBody, (string) $this->credentials->getSecret(), true));
+
+        // Verify that the signatures match
+        if (!\hash_equals($hmacHeader, $hmacString)) {
+            throw new AuthorizationException(\sprintf(
+                "The HMAC provided by Shopify (%s) doesn't match the HMAC verification (%s).",
+                $hmacHeader,
+                $hmacString
+            ));
+        }
+
+        if (\strpos($contentTypeHeader, 'application/json') !== false) {
+            $data = \json_decode($requestBody, true);
+            if (!\is_array($data)) {
+                throw new AuthorizationException('Failed to decode webhook body: ' . $requestBody);
+            }
+        } else {
+            throw new AuthorizationException('Unsupported webhook content type ' . $contentTypeHeader);
+        }
+
+        return new WebhookRequest($shopDomain, $topicHeader, $data);
+    }
 
     /**
      * @param array $requestData

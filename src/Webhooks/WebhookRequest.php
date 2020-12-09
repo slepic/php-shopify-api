@@ -10,11 +10,13 @@ final class WebhookRequest
 {
     private ShopDomain $shopDomain;
     private string $topic;
+    private array $data;
 
-    public function __construct(ShopDomain $shopDomain, string $topic)
+    public function __construct(ShopDomain $shopDomain, string $topic, array $data)
     {
         $this->shopDomain = $shopDomain;
         $this->topic = $topic;
+        $this->data = $data;
     }
 
     public function getShopDomain(): ShopDomain
@@ -25,5 +27,10 @@ final class WebhookRequest
     public function getTopic(): string
     {
         return $this->topic;
+    }
+
+    public function getData(): array
+    {
+        return $this->data;
     }
 }
