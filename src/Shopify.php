@@ -162,18 +162,6 @@ class Shopify
     }
 
     /**
-     * @param RequestInterface $request
-     * @return WebhookRequest
-     * @throws AuthorizationException
-     * @deprecated Use WebhookRequestFactory
-     */
-    public function validateWebhookRequest(RequestInterface  $request): WebhookRequest
-    {
-        $factory = new WebhookRequestFactory($this->credentials->getSecret());
-        return $factory->createWebhookRequest($request);
-    }
-
-    /**
      * @param array $requestData
      * @param string $nonce
      * @param ShopDomain|null $shopDomain
