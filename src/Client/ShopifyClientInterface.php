@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace LukeTowers\ShopifyPHP\Client;
 
-use LukeTowers\ShopifyPHP\ShopifyExceptionInterface;
-
 interface ShopifyClientInterface
 {
     /**
@@ -14,7 +12,7 @@ interface ShopifyClientInterface
      * @param array|object|null $body
      * @param array<string, mixed> $query
      * @return ShopifyResponse
-     * @throws ShopifyExceptionInterface
+     * @throws ShopifyClientException
      */
     public function call(string $method, string $endpoint, $body = null, array $query = []): ShopifyResponse;
 }

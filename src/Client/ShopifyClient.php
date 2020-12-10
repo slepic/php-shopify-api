@@ -38,7 +38,7 @@ final class ShopifyClient implements ShopifyClientInterface
     {
         try {
             $response = $this->client->call(
-                'https://' . (string) $this->shopDomain,
+                $this->shopDomain->getShopUrl(),
                 $method,
                 $endpoint,
                 $this->headers,

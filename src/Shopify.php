@@ -6,11 +6,12 @@ namespace LukeTowers\ShopifyPHP;
 
 use LukeTowers\ShopifyPHP\Client\ShopifyClient;
 use LukeTowers\ShopifyPHP\Client\ShopifyClientInterface;
+use LukeTowers\ShopifyPHP\Client\ShopifyGraphqlClient;
+use LukeTowers\ShopifyPHP\Client\ShopifyGraphqlClientInterface;
 use LukeTowers\ShopifyPHP\Credentials\AccessToken;
 use LukeTowers\ShopifyPHP\Credentials\ApiCredentials;
 use LukeTowers\ShopifyPHP\Credentials\ApiKey;
 use LukeTowers\ShopifyPHP\Credentials\ShopDomain;
-use LukeTowers\ShopifyPHP\Credentials\ShopDomainException;
 use LukeTowers\ShopifyPHP\Http\JsonClient;
 use LukeTowers\ShopifyPHP\Http\JsonClientException;
 use LukeTowers\ShopifyPHP\Http\JsonClientInterface;
@@ -287,5 +288,10 @@ class Shopify
     public function createPublicApp(string $redirectUrl, Scopes $requiredScopes, ?Scopes $optionalScopes = null): ShopifyPublicApp
     {
         return new ShopifyPublicApp($this, $redirectUrl, $requiredScopes, $optionalScopes);
+    }
+
+    public function graphql(ShopifyClientInterface $client): ShopifyGraphqlClientInterface
+    {
+        return new ShopifyGraphqlClient($client);
     }
 }

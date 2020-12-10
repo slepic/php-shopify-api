@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LukeTowers\ShopifyPHP;
 
 use LukeTowers\ShopifyPHP\Client\ShopifyClientInterface;
+use LukeTowers\ShopifyPHP\Client\ShopifyGraphqlClientInterface;
 use LukeTowers\ShopifyPHP\Credentials\AccessToken;
 use LukeTowers\ShopifyPHP\Credentials\ApiKey;
 use LukeTowers\ShopifyPHP\Credentials\ShopDomain;
@@ -126,5 +127,10 @@ class ShopifyPublicApp
     public function createPublicAppClient(ShopDomain $shopDomain, AccessToken $accessToken): ShopifyClientInterface
     {
         return $this->shopify->createPublicAppClient($shopDomain, $accessToken);
+    }
+
+    public function graphql(ShopifyClientInterface $client): ShopifyGraphqlClientInterface
+    {
+        return $this->shopify->graphql($client);
     }
 }
