@@ -10,13 +10,15 @@ final class ShopifyResponse
     private array $body;
     private ?int $callsMade;
     private ?int $callLimit;
+    private ?int $cost;
 
-    private function __construct(int $status, array $body, ?int $callsMade = null, ?int $callLimit = null)
+    private function __construct(int $status, array $body, ?int $callsMade = null, ?int $callLimit = null, ?int $cost = null)
     {
         $this->status = $status;
         $this->body = $body;
         $this->callsMade = $callsMade;
         $this->callLimit = $callLimit;
+        $this->cost = $cost;
     }
 
     public static function unlimited(int $status, array $body): self
@@ -24,9 +26,9 @@ final class ShopifyResponse
         return new self($status, $body);
     }
 
-    public static function limited(int $status, array $body, int $callsMade, int $callLimit): self
+    public static function limited(int $status, array $body, int $callsMade, int $callLimit, int $cost): self
     {
-        return new self($status, $body, $callsMade, $callLimit);
+        return new self($status, $body, $callsMade, $callLimit, $cost);
     }
 
     public function getStatus(): int
@@ -47,5 +49,10 @@ final class ShopifyResponse
     public function getCallLimit(): ?int
     {
         return $this->callLimit;
+    }
+
+    public function getCost(): ?int
+    {
+        return $this->cost;
     }
 }

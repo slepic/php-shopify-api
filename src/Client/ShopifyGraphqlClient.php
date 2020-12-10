@@ -62,17 +62,20 @@ final class ShopifyGraphqlClient implements ShopifyGraphqlClientInterface
 
         if (
             isset($responseBody['extensions']['cost']['throttleStatus']['maximumAvailable']) &&
-            isset($responseBody['extensions']['cost']['throttleStatus']['currentlyAvailable'])
+            isset($responseBody['extensions']['cost']['throttleStatus']['currentlyAvailable']) &&
+            isset($responseBody['extensions']['cost']['actualQueryCost'])
         ) {
             $callsLimit = (int) $responseBody['extensions']['cost']['throttleStatus']['maximumAvailable'];
             $callsRemaining = (int) $responseBody['extensions']['cost']['throttleStatus']['currentlyAvailable'];
             $callsMade = $callsLimit - $callsRemaining;
+            $cost = (int) $responseBody['extensions']['cost']['actualQueryCost'];
 
             return ShopifyResponse::limited(
                 $response->getStatus(),
                 $responseData,
                 $callsMade,
-                $callsLimit
+                $callsLimit,
+                $cost,
             );
         }
 
