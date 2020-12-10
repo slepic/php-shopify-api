@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LukeTowers\ShopifyPHP\Client;
+namespace Slepic\Shopify\Client;
 
-use LukeTowers\ShopifyPHP\ShopifyExceptionInterface;
+use Slepic\Shopify\ShopifyExceptionInterface;
 
 class ShopifyClientException extends \RuntimeException implements ShopifyExceptionInterface
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LukeTowers\ShopifyPHP\Client;
+namespace Slepic\Shopify\Client;
 
 interface ShopifyClientInterface
 {

@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace LukeTowers\ShopifyPHP;
+namespace Slepic\Shopify;
 
-use LukeTowers\ShopifyPHP\Client\ShopifyClientInterface;
-use LukeTowers\ShopifyPHP\Client\ShopifyGraphqlClientInterface;
-use LukeTowers\ShopifyPHP\Credentials\AccessToken;
-use LukeTowers\ShopifyPHP\Credentials\ApiKey;
-use LukeTowers\ShopifyPHP\Credentials\ShopDomain;
-use LukeTowers\ShopifyPHP\Credentials\ShopDomainException;
-use LukeTowers\ShopifyPHP\OAuth\AuthorizationException;
-use LukeTowers\ShopifyPHP\OAuth\AuthorizationRequest;
-use LukeTowers\ShopifyPHP\OAuth\AuthorizationResponse;
-use LukeTowers\ShopifyPHP\OAuth\ScopeException;
-use LukeTowers\ShopifyPHP\OAuth\Scopes;
+use Slepic\Shopify\Client\ShopifyClientInterface;
+use Slepic\Shopify\Client\ShopifyGraphqlClientInterface;
+use Slepic\Shopify\Credentials\AccessToken;
+use Slepic\Shopify\Credentials\ApiKey;
+use Slepic\Shopify\Credentials\ShopDomain;
+use Slepic\Shopify\Credentials\ShopDomainException;
+use Slepic\Shopify\OAuth\AuthorizationException;
+use Slepic\Shopify\OAuth\AuthorizationRequest;
+use Slepic\Shopify\OAuth\AuthorizationResponse;
+use Slepic\Shopify\OAuth\ScopeException;
+use Slepic\Shopify\OAuth\Scopes;
 
 class ShopifyPublicApp
 {

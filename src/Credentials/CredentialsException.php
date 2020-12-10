@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LukeTowers\ShopifyPHP\Credentials;
+namespace Slepic\Shopify\Credentials;
 
-use LukeTowers\ShopifyPHP\ShopifyExceptionInterface;
+use Slepic\Shopify\ShopifyExceptionInterface;
 
 class CredentialsException extends \InvalidArgumentException implements ShopifyExceptionInterface
 {

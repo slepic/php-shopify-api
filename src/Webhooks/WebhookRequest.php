@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LukeTowers\ShopifyPHP\Webhooks;
+namespace Slepic\Shopify\Webhooks;
 
-use LukeTowers\ShopifyPHP\Credentials\ShopDomain;
+use Slepic\Shopify\Credentials\ShopDomain;
 
 final class WebhookRequest
 {

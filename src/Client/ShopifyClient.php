@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace LukeTowers\ShopifyPHP\Client;
+namespace Slepic\Shopify\Client;
 
-use LukeTowers\ShopifyPHP\Credentials\ShopDomain;
-use LukeTowers\ShopifyPHP\Http\JsonClientException;
-use LukeTowers\ShopifyPHP\Http\JsonClientInterface;
+use Slepic\Shopify\Credentials\ShopDomain;
+use Slepic\Shopify\Http\JsonClientException;
+use Slepic\Shopify\Http\JsonClientInterface;
 
 final class ShopifyClient implements ShopifyClientInterface
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LukeTowers\ShopifyPHP\Credentials;
+namespace Slepic\Shopify\Credentials;
 
 abstract class Credential implements \JsonSerializable
 {

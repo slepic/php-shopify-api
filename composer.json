@@ -1,8 +1,8 @@
 {
     "name": "luketowers/php-shopify-api",
     "description": "PHP wrapper for Shopify API",
-    "keywords": ["PHP","Shopify","API"],
-    "homepage": "https://github.com/luketowers/php-shopify-api",
+    "keywords": ["Shopify"],
+    "homepage": "https://github.com/slepic/php-shopify-api",
     "type": "library",
     "require": {
         "php": ">=7.4",
@@ -19,7 +19,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "LukeTowers\\ShopifyPHP\\": "src/"
+            "Slepic\\Shopify\\": "src/"
         }
     },
     "require-dev": {

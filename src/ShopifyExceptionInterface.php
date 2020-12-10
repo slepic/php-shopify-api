@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LukeTowers\ShopifyPHP;
+namespace Slepic\Shopify;
 
 interface ShopifyExceptionInterface extends \Throwable
 {

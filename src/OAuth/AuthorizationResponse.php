@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LukeTowers\ShopifyPHP\OAuth;
+namespace Slepic\Shopify\OAuth;
 
-use LukeTowers\ShopifyPHP\Credentials\AccessToken;
+use Slepic\Shopify\Credentials\AccessToken;
 
 final class AuthorizationResponse
 {

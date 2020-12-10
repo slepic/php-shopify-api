@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LukeTowers\ShopifyPHP\Webhooks;
+namespace Slepic\Shopify\Webhooks;
 
-use LukeTowers\ShopifyPHP\Credentials\ApiSecretKey;
-use LukeTowers\ShopifyPHP\Credentials\ShopDomain;
+use Slepic\Shopify\Credentials\ApiSecretKey;
+use Slepic\Shopify\Credentials\ShopDomain;
 use Psr\Http\Message\RequestInterface;
 
 class WebhookRequestFactory

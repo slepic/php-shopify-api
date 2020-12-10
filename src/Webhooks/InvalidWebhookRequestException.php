@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LukeTowers\ShopifyPHP\Webhooks;
+namespace Slepic\Shopify\Webhooks;
 
 class InvalidWebhookRequestException extends \Exception
 {

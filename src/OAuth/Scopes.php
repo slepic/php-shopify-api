@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LukeTowers\ShopifyPHP\OAuth;
+namespace Slepic\Shopify\OAuth;
 
 final class Scopes implements \Countable, \IteratorAggregate, \JsonSerializable
 {

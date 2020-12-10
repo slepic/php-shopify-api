@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace LukeTowers\ShopifyPHP;
+namespace Slepic\Shopify;
 
-use LukeTowers\ShopifyPHP\Client\ShopifyClient;
-use LukeTowers\ShopifyPHP\Client\ShopifyClientInterface;
-use LukeTowers\ShopifyPHP\Client\ShopifyGraphqlClient;
-use LukeTowers\ShopifyPHP\Client\ShopifyGraphqlClientInterface;
-use LukeTowers\ShopifyPHP\Credentials\AccessToken;
-use LukeTowers\ShopifyPHP\Credentials\ApiCredentials;
-use LukeTowers\ShopifyPHP\Credentials\ApiKey;
-use LukeTowers\ShopifyPHP\Credentials\ShopDomain;
-use LukeTowers\ShopifyPHP\Http\JsonClient;
-use LukeTowers\ShopifyPHP\Http\JsonClientException;
-use LukeTowers\ShopifyPHP\Http\JsonClientInterface;
-use LukeTowers\ShopifyPHP\OAuth\AuthorizationException;
-use LukeTowers\ShopifyPHP\OAuth\AuthorizationRequest;
-use LukeTowers\ShopifyPHP\OAuth\AuthorizationResponse;
-use LukeTowers\ShopifyPHP\OAuth\Scopes;
+use Slepic\Shopify\Client\ShopifyClient;
+use Slepic\Shopify\Client\ShopifyClientInterface;
+use Slepic\Shopify\Client\ShopifyGraphqlClient;
+use Slepic\Shopify\Client\ShopifyGraphqlClientInterface;
+use Slepic\Shopify\Credentials\AccessToken;
+use Slepic\Shopify\Credentials\ApiCredentials;
+use Slepic\Shopify\Credentials\ApiKey;
+use Slepic\Shopify\Credentials\ShopDomain;
+use Slepic\Shopify\Http\JsonClient;
+use Slepic\Shopify\Http\JsonClientException;
+use Slepic\Shopify\Http\JsonClientInterface;
+use Slepic\Shopify\OAuth\AuthorizationException;
+use Slepic\Shopify\OAuth\AuthorizationRequest;
+use Slepic\Shopify\OAuth\AuthorizationResponse;
+use Slepic\Shopify\OAuth\Scopes;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 
