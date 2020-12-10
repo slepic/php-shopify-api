@@ -15,8 +15,6 @@ use LukeTowers\ShopifyPHP\OAuth\AuthorizationRequest;
 use LukeTowers\ShopifyPHP\OAuth\AuthorizationResponse;
 use LukeTowers\ShopifyPHP\OAuth\ScopeException;
 use LukeTowers\ShopifyPHP\OAuth\Scopes;
-use LukeTowers\ShopifyPHP\Webhooks\WebhookRequest;
-use Psr\Http\Message\RequestInterface;
 
 class ShopifyPublicApp
 {
@@ -119,8 +117,8 @@ class ShopifyPublicApp
         return $this->shopify->createPublicAppClient($shopDomain, $accessToken);
     }
 
-    public function graphql(ShopifyClientInterface $client): ShopifyGraphqlClientInterface
+    public function createPublicAppGraphqlClient(ShopDomain $shopDomain, AccessToken $accessToken): ShopifyGraphqlClientInterface
     {
-        return $this->shopify->graphql($client);
+        return $this->shopify->createPublicAppGraphqlClient($shopDomain, $accessToken);
     }
 }

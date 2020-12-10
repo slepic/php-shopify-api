@@ -19,11 +19,8 @@ use LukeTowers\ShopifyPHP\OAuth\AuthorizationException;
 use LukeTowers\ShopifyPHP\OAuth\AuthorizationRequest;
 use LukeTowers\ShopifyPHP\OAuth\AuthorizationResponse;
 use LukeTowers\ShopifyPHP\OAuth\Scopes;
-use LukeTowers\ShopifyPHP\Webhooks\WebhookRequest;
-use LukeTowers\ShopifyPHP\Webhooks\WebhookRequestFactory;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\RequestInterface;
 
 class Shopify
 {
@@ -47,7 +44,8 @@ class Shopify
         ShopDomain $shopDomain,
         ApiCredentials $credentials
     ): ShopifyClientInterface {
-        return ShopifyClient::forPrivateApp(new JsonClient($requestFactory, $client), $shopDomain, $credentials);
+        $headers = self::privateAppAuthHeaders($credentials);
+        return new ShopifyClient(new JsonClient($requestFactory, $client), $shopDomain, $headers);
     }
 
     public static function publicAppClient(
@@ -56,7 +54,8 @@ class Shopify
         ShopDomain $shopDomain,
         AccessToken $accessToken
     ): ShopifyClientInterface {
-        return ShopifyClient::forPublicApp(new JsonClient($requestFactory, $client), $shopDomain, $accessToken);
+        $headers = self::publicAppAuthHeaders($accessToken);
+        return new ShopifyClient(new JsonClient($requestFactory, $client), $shopDomain, $headers);
     }
 
     public static function publicApp(
@@ -223,12 +222,14 @@ class Shopify
 
     public function createPublicAppClient(ShopDomain $shopDomain, AccessToken $accessToken): ShopifyClientInterface
     {
-        return ShopifyClient::forPublicApp($this->client, $shopDomain, $accessToken);
+        $headers = self::publicAppAuthHeaders($accessToken);
+        return new ShopifyClient($this->client, $shopDomain, $headers);
     }
 
     public function createPrivateAppClient(ShopDomain $shopDomain): ShopifyClientInterface
     {
-        return ShopifyClient::forPrivateApp($this->client, $shopDomain, $this->credentials);
+        $headers = self::privateAppAuthHeaders($this->credentials);
+        return new ShopifyClient($this->client, $shopDomain, $headers);
     }
 
     public function createPublicApp(string $redirectUrl, Scopes $requiredScopes, ?Scopes $optionalScopes = null): ShopifyPublicApp
@@ -236,8 +237,20 @@ class Shopify
         return new ShopifyPublicApp($this, $redirectUrl, $requiredScopes, $optionalScopes);
     }
 
-    public function graphql(ShopifyClientInterface $client): ShopifyGraphqlClientInterface
+    public function createPublicAppGraphqlClient(ShopDomain $shopDomain, AccessToken $accessToken): ShopifyGraphqlClientInterface
     {
-        return new ShopifyGraphqlClient($client);
+        $headers = self::publicAppAuthHeaders($accessToken);
+        return new ShopifyGraphqlClient($this->client, $shopDomain, $headers);
+    }
+
+    private static function publicAppAuthHeaders(AccessToken $accessToken): array
+    {
+        return ['X-Shopify-Access-Token' => (string) $accessToken];
+    }
+
+    private static function privateAppAuthHeaders(ApiCredentials $credentials): array
+    {
+        $authHeader = 'Basic ' . \base64_encode($credentials->getApiKey() . ':' . $credentials->getSecret());
+        return ['Authorization' => $authHeader];
     }
 }
