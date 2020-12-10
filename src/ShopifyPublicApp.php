@@ -80,16 +80,6 @@ class ShopifyPublicApp
     }
 
     /**
-     * @param RequestInterface $request
-     * @return WebhookRequest
-     * @throws AuthorizationException
-     */
-    public function validateWebhookRequest(RequestInterface $request): WebhookRequest
-    {
-        return $this->shopify->validateWebhookRequest($request);
-    }
-
-    /**
      * @param array $requestData
      * @param string $nonce
      * @param ShopDomain|null $shopDomain
