@@ -20,6 +20,7 @@ use LukeTowers\ShopifyPHP\OAuth\AuthorizationRequest;
 use LukeTowers\ShopifyPHP\OAuth\AuthorizationResponse;
 use LukeTowers\ShopifyPHP\OAuth\Scopes;
 use LukeTowers\ShopifyPHP\Webhooks\WebhookRequest;
+use LukeTowers\ShopifyPHP\Webhooks\WebhookRequestFactory;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
@@ -164,55 +165,12 @@ class Shopify
      * @param RequestInterface $request
      * @return WebhookRequest
      * @throws AuthorizationException
+     * @deprecated Use WebhookRequestFactory
      */
     public function validateWebhookRequest(RequestInterface  $request): WebhookRequest
     {
-        $shopDomainHeader = $request->getHeaderLine('X-Shopify-Shop-Domain');
-        $topicHeader = $request->getHeaderLine('X-Shopify-Topic');
-        $hmacHeader = $request->getHeaderLine('X-Shopify-Hmac-Sha256');
-        $contentTypeHeader = $request->getHeaderLine('Content-Type');
-
-        try {
-            $shopDomain = ShopDomain::create($shopDomainHeader);
-        } catch (\Throwable $e) {
-            throw new AuthorizationException("The shop provided by Shopify is invalid: " . $e->getMessage());
-        }
-
-        if (!$topicHeader) {
-            throw new AuthorizationException('Missing webhook topic');
-        }
-
-        if (!$hmacHeader) {
-            throw new AuthorizationException('Missing webhook signature');
-        }
-
-        if (!$contentTypeHeader) {
-            throw new AuthorizationException('Missing webhook content type');
-        }
-
-        $requestBody = (string) $request->getBody();
-
-        $hmacString = base64_encode(hash_hmac('sha256', $requestBody, (string) $this->credentials->getSecret(), true));
-
-        // Verify that the signatures match
-        if (!\hash_equals($hmacHeader, $hmacString)) {
-            throw new AuthorizationException(\sprintf(
-                "The HMAC provided by Shopify (%s) doesn't match the HMAC verification (%s).",
-                $hmacHeader,
-                $hmacString
-            ));
-        }
-
-        if (\strpos($contentTypeHeader, 'application/json') !== false) {
-            $data = \json_decode($requestBody, true);
-            if (!\is_array($data)) {
-                throw new AuthorizationException('Failed to decode webhook body: ' . $requestBody);
-            }
-        } else {
-            throw new AuthorizationException('Unsupported webhook content type ' . $contentTypeHeader);
-        }
-
-        return new WebhookRequest($shopDomain, $topicHeader, $data);
+        $factory = new WebhookRequestFactory($this->credentials->getSecret());
+        return $factory->createWebhookRequest($request);
     }
 
     /**
