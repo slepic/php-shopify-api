@@ -17,10 +17,10 @@ final class ShopifyGraphqlClient implements ShopifyGraphqlClientInterface
     {
         $response = $this->client->call(
             'POST',
-            '/admin/graphql.json',
+            '/admin/api/graphql.json',
             [
                 'query' => $query,
-                'variables' => $variables,
+                'variables' => (object) $variables,
             ]
         );
 
