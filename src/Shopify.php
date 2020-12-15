@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Slepic\Shopify;
 
+use Slepic\Http\JsonApiClient\JsonClientExceptionInterface;
+use Slepic\Http\JsonApiClient\JsonClientInterface;
 use Slepic\Shopify\Client\ShopifyClient;
 use Slepic\Shopify\Client\ShopifyClientInterface;
 use Slepic\Shopify\Client\ShopifyGraphqlClient;
@@ -12,15 +14,10 @@ use Slepic\Shopify\Credentials\AccessToken;
 use Slepic\Shopify\Credentials\ApiCredentials;
 use Slepic\Shopify\Credentials\ApiKey;
 use Slepic\Shopify\Credentials\ShopDomain;
-use Slepic\Shopify\Http\JsonClient;
-use Slepic\Shopify\Http\JsonClientException;
-use Slepic\Shopify\Http\JsonClientInterface;
 use Slepic\Shopify\OAuth\AuthorizationException;
 use Slepic\Shopify\OAuth\AuthorizationRequest;
 use Slepic\Shopify\OAuth\AuthorizationResponse;
 use Slepic\Shopify\OAuth\Scopes;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
 
 class Shopify
 {
@@ -33,41 +30,38 @@ class Shopify
         $this->credentials = $credentials;
     }
 
-    public static function create(RequestFactoryInterface $requestFactory, ClientInterface $client, ApiCredentials $credentials): self
+    public static function create(JsonClientInterface $client, ApiCredentials $credentials): self
     {
-        return new self(new JsonClient($requestFactory, $client), $credentials);
+        return new self($client, $credentials);
     }
 
     public static function privateAppClient(
-        RequestFactoryInterface $requestFactory,
-        ClientInterface $client,
+        JsonClientInterface $client,
         ShopDomain $shopDomain,
         ApiCredentials $credentials
     ): ShopifyClientInterface {
         $headers = self::privateAppAuthHeaders($credentials);
-        return new ShopifyClient(new JsonClient($requestFactory, $client), $shopDomain, $headers);
+        return new ShopifyClient($client, $shopDomain, $headers);
     }
 
     public static function publicAppClient(
-        RequestFactoryInterface $requestFactory,
-        ClientInterface $client,
+        JsonClientInterface $client,
         ShopDomain $shopDomain,
         AccessToken $accessToken
     ): ShopifyClientInterface {
         $headers = self::publicAppAuthHeaders($accessToken);
-        return new ShopifyClient(new JsonClient($requestFactory, $client), $shopDomain, $headers);
+        return new ShopifyClient($client, $shopDomain, $headers);
     }
 
     public static function publicApp(
-        RequestFactoryInterface $requestFactory,
-        ClientInterface $client,
+        JsonClientInterface $client,
         ApiCredentials $credentials,
         string $redirectUrl,
         Scopes $requiredScopes,
         ?Scopes $optionalScopes = null
     ): ShopifyPublicApp
     {
-        return self::create($requestFactory, $client, $credentials)
+        return self::create($client, $credentials)
             ->createPublicApp($redirectUrl, $requiredScopes, $optionalScopes);
     }
 
@@ -203,21 +197,22 @@ class Shopify
                 'POST',
                 '/admin/oauth/access_token',
                 [],
+                [],
                 [
                     'client_id'     => (string) $this->credentials->getApiKey(),
                     'client_secret' => (string) $this->credentials->getSecret(),
                     'code'          => $request->getCode(),
                 ]
             );
-        } catch (JsonClientException $e) {
-            throw new AuthorizationException('Authorization request failed: ' . $e->getMessage(), 0, $e);
+        } catch (JsonClientExceptionInterface $e) {
+            throw new AuthorizationException(
+                'Authorization request failed: ' . $e->getMessage(),
+                (int) $e->getCode(),
+                $e
+            );
         }
 
-        $status = $response->getStatus();
-        if ($status !== 200) {
-            throw new AuthorizationException('Unexpected authorization response status ' . $status, $status);
-        }
-        return AuthorizationResponse::fromArray($response->getBody());
+        return AuthorizationResponse::fromArray($response->getParsedBody());
     }
 
     public function createPublicAppClient(ShopDomain $shopDomain, AccessToken $accessToken): ShopifyClientInterface

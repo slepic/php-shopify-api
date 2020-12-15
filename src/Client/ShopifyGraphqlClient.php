@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Slepic\Shopify\Client;
 
+use Slepic\Http\JsonApiClient\JsonClientExceptionInterface;
+use Slepic\Http\JsonApiClient\JsonClientInterface;
 use Slepic\Shopify\Credentials\ShopDomain;
-use Slepic\Shopify\Http\JsonClientException;
-use Slepic\Shopify\Http\JsonClientInterface;
 
 final class ShopifyGraphqlClient implements ShopifyGraphqlClientInterface
 {
@@ -28,24 +28,18 @@ final class ShopifyGraphqlClient implements ShopifyGraphqlClientInterface
                 $this->shopDomain->getShopUrl(),
                 'POST',
                 '/admin/api/graphql.json',
+                [],
                 $this->headers,
                 [
                     'query' => $query,
                     'variables' => (object) $variables,
                 ]
             );
-        } catch (JsonClientException $e) {
+        } catch (JsonClientExceptionInterface $e) {
             throw new ShopifyClientException($e->getMessage(), (int) $e->getCode(), $e);
         }
 
-        if ($response->getStatus() < 200 || $response->getStatus() >= 300) {
-            throw new ShopifyClientException(
-                'Shopify GraphQL request failed with status ' . $response->getStatus(),
-                $response->getStatus()
-            );
-        }
-
-        $responseBody = $response->getBody();
+        $responseBody = $response->getParsedBody();
 
         if ($responseBody['errors'] ?? false) {
             throw new ShopifyClientException(\sprintf(
@@ -71,7 +65,7 @@ final class ShopifyGraphqlClient implements ShopifyGraphqlClientInterface
             $cost = (int) $responseBody['extensions']['cost']['actualQueryCost'];
 
             return ShopifyResponse::limited(
-                $response->getStatus(),
+                $response->getStatusCode(),
                 $responseData,
                 $callsMade,
                 $callsLimit,
@@ -79,6 +73,6 @@ final class ShopifyGraphqlClient implements ShopifyGraphqlClientInterface
             );
         }
 
-        return ShopifyResponse::unlimited($response->getStatus(), $responseData);
+        return ShopifyResponse::unlimited($response->getStatusCode(), $responseData);
     }
 }

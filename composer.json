@@ -1,22 +1,23 @@
 {
-    "name": "luketowers/php-shopify-api",
+    "name": "slepic/php-shopify-api",
     "description": "PHP wrapper for Shopify API",
     "keywords": ["Shopify"],
     "homepage": "https://github.com/slepic/php-shopify-api",
     "type": "library",
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/slepic/php-json-api-client.git"
+        }
+    ],
     "require": {
         "php": ">=7.4",
         "ext-json": "*",
         "psr/http-factory": "^1.0",
-        "psr/http-client": "^1.0"
+        "psr/http-client": "^1.0",
+        "slepic/json-api-client": "dev-master"
     },
     "license": "MIT",
-    "authors": [
-        {
-            "name": "Luke Towers",
-            "email": "github@luketowers.ca"
-        }
-    ],
     "autoload": {
         "psr-4": {
             "Slepic\\Shopify\\": "src/"
@@ -24,5 +25,7 @@
     },
     "require-dev": {
         "vimeo/psalm": "^4.2"
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

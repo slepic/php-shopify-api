@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Slepic\Shopify\Client;
 
+use Slepic\Http\JsonApiClient\JsonClientExceptionInterface;
+use Slepic\Http\JsonApiClient\JsonClientInterface;
 use Slepic\Shopify\Credentials\ShopDomain;
-use Slepic\Shopify\Http\JsonClientException;
-use Slepic\Shopify\Http\JsonClientInterface;
 
 final class ShopifyClient implements ShopifyClientInterface
 {
@@ -28,19 +28,25 @@ final class ShopifyClient implements ShopifyClientInterface
                 $this->shopDomain->getShopUrl(),
                 $method,
                 $endpoint,
+                $query,
                 $this->headers,
-                $body,
-                $query
+                $body
             );
-        } catch (JsonClientException $e) {
+        } catch (JsonClientExceptionInterface $e) {
             throw new ShopifyClientException($e->getMessage(), (int) $e->getCode(), $e);
         }
 
         $matches = [];
-        $apiCallLimitHeader = $response->getHeader('X-Shopify-Shop-Api-Call-Limit');
+        $apiCallLimitHeader = $response->getHeaderLine('X-Shopify-Shop-Api-Call-Limit');
         if (!$apiCallLimitHeader || !\preg_match('#^(\\d+)/(\\d+)$#', $apiCallLimitHeader, $matches)) {
-            return ShopifyResponse::unlimited($response->getStatus(), $response->getBody());
+            return ShopifyResponse::unlimited($response->getStatusCode(), $response->getParsedBody());
         }
-        return ShopifyResponse::limited($response->getStatus(), $response->getBody(), (int) $matches[0], (int) $matches[1], 1);
+        return ShopifyResponse::limited(
+            $response->getStatusCode(),
+            $response->getParsedBody(),
+            (int) $matches[0],
+            (int) $matches[1],
+            1
+        );
     }
 }
