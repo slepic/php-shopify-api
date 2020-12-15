@@ -1,5 +1,5 @@
 {
-    "name": "slepic/php-shopify-api",
+    "name": "luketowers/php-shopify-api",
     "description": "PHP wrapper for Shopify API",
     "keywords": ["Shopify"],
     "homepage": "https://github.com/slepic/php-shopify-api",
