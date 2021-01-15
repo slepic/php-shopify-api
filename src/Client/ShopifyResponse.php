@@ -45,16 +45,12 @@ final class ShopifyResponse
         return $this->status;
     }
 
-    public function getParsedBody(): array
+    public function getRawBody(): string
     {
-        return $this->parsedBody;
+        return $this->rawBody;
     }
 
-    /**
-     * @deprecated use getParsedBody()
-     * @return array
-     */
-    public function getBody(): array
+    public function getParsedBody(): array
     {
         return $this->parsedBody;
     }
