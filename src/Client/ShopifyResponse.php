@@ -7,28 +7,37 @@ namespace Slepic\Shopify\Client;
 final class ShopifyResponse
 {
     private int $status;
-    private array $body;
+    private string $rawBody;
+    private array $parsedBody;
     private ?int $callsMade;
     private ?int $callLimit;
     private ?int $cost;
 
-    private function __construct(int $status, array $body, ?int $callsMade = null, ?int $callLimit = null, ?int $cost = null)
+    private function __construct(
+        int $status,
+        string $rawBody,
+        array $parsedBody,
+        ?int $callsMade = null,
+        ?int $callLimit = null,
+        ?int $cost = null
+    )
     {
         $this->status = $status;
-        $this->body = $body;
+        $this->rawBody = $rawBody;
+        $this->parsedBody = $parsedBody;
         $this->callsMade = $callsMade;
         $this->callLimit = $callLimit;
         $this->cost = $cost;
     }
 
-    public static function unlimited(int $status, array $body): self
+    public static function unlimited(int $status, string $rawBody, array $parsedBody): self
     {
-        return new self($status, $body);
+        return new self($status, $rawBody, $parsedBody);
     }
 
-    public static function limited(int $status, array $body, int $callsMade, int $callLimit, int $cost): self
+    public static function limited(int $status, string $rawBody, array $parsedBody, int $callsMade, int $callLimit, int $cost): self
     {
-        return new self($status, $body, $callsMade, $callLimit, $cost);
+        return new self($status, $rawBody, $parsedBody, $callsMade, $callLimit, $cost);
     }
 
     public function getStatus(): int
@@ -36,9 +45,18 @@ final class ShopifyResponse
         return $this->status;
     }
 
+    public function getParsedBody(): array
+    {
+        return $this->parsedBody;
+    }
+
+    /**
+     * @deprecated use getParsedBody()
+     * @return array
+     */
     public function getBody(): array
     {
-        return $this->body;
+        return $this->parsedBody;
     }
 
     public function getCallsMade(): ?int

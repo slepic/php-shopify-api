@@ -66,6 +66,7 @@ final class ShopifyGraphqlClient implements ShopifyGraphqlClientInterface
 
             return ShopifyResponse::limited(
                 $response->getStatusCode(),
+                $response->getRawBody(),
                 $responseData,
                 $callsMade,
                 $callsLimit,
@@ -73,6 +74,6 @@ final class ShopifyGraphqlClient implements ShopifyGraphqlClientInterface
             );
         }
 
-        return ShopifyResponse::unlimited($response->getStatusCode(), $responseData);
+        return ShopifyResponse::unlimited($response->getStatusCode(), $response->getRawBody(), $responseData);
     }
 }
